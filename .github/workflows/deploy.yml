@@ -27,6 +27,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npx prisma generate
+
       - run: npx next build
         env:
           NEXT_PUBLIC_VAPI_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPI_PUBLIC_KEY }}
