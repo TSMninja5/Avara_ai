@@ -290,28 +290,38 @@ html { scroll-behavior: smooth; }
   pointer-events: none;
 }
 
-.l-hero .l-container { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; }
+.l-hero .l-container { position: relative; z-index: 2; flex: 1; }
 
-.hero-grid {
+.l-hero .hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
-  align-items: center;
-  flex: 1;
-  padding: 120px 0 80px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 36px 32px;
+  align-items: start;
+  min-height: 100vh;
+  padding: 120px 0 60px;
 }
+/* text — top-left */
+.hero-copy { grid-column: 1; grid-row: 1; padding-top: 40px; }
+
+/* orb — below text, centered under buttons */
+.orb-wrap { grid-column: 1; grid-row: 2; align-self: start; justify-self: start; padding-left: 80px; padding-bottom: 20px; }
+
+/* transcript — right side, spans both rows */
+.hero-call-transcript { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+
 .l-hero h1 {
-  font-size: clamp(46px, 6.5vw, 80px);
+  font-size: clamp(42px, 5.5vw, 72px);
   letter-spacing: -0.035em;
   color: #ffffff;
 }
 .hero-sub {
-  margin-top: 26px;
-  font-size: 20px;
+  margin-top: 22px;
+  font-size: 19px;
   color: rgba(255,255,255,0.65);
-  max-width: 540px;
+  max-width: 480px;
 }
-.hero-actions { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-actions { margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; }
 .l-hero .l-btn-ghost {
   color: #ffffff;
   background: rgba(255,255,255,0.08);
@@ -346,9 +356,21 @@ html { scroll-behavior: smooth; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 420px;
+  min-height: auto;
   gap: 18px;
 }
+/* transcript column — right side, fades in, never shifts the grid */
+.hero-call-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-self: center;
+  animation: pop 0.5s cubic-bezier(0.22,1,0.36,1);
+  min-width: 0;
+  width: 100%;
+}
+/* placeholder keeps the 3rd column alive when no call is active */
+.hero-transcript-placeholder { visibility: hidden; pointer-events: none; height: 0; }
 .orb {
   position: relative; width: 260px; height: 260px; border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, rgba(13,148,136,0.5), rgba(2,132,199,0.28) 45%, rgba(124,58,237,0.18) 70%, transparent 72%);
@@ -464,11 +486,11 @@ html { scroll-behavior: smooth; }
 /* hero transcript panel (dark glassmorphism) */
 .hero-transcript {
   width: 100%;
-  max-width: 400px;
-  max-height: 200px;
+  max-width: 420px;
+  max-height: 320px;
   overflow-y: auto;
   scroll-behavior: smooth;
-  padding: 14px;
+  padding: 16px;
   border-radius: 18px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
@@ -480,6 +502,11 @@ html { scroll-behavior: smooth; }
   animation: pop 0.5s cubic-bezier(0.22,1,0.36,1);
 }
 .hero-transcript::-webkit-scrollbar { display: none; }
+/* in the right column — fill it */
+.hero-call-transcript .hero-transcript {
+  max-width: 100%;
+  max-height: 400px;
+}
 
 .ht-bubble {
   padding: 8px 13px;
@@ -520,6 +547,19 @@ html { scroll-behavior: smooth; }
   padding: 16px;
 }
 
+/* live partial transcript — slightly transparent with blinking cursor */
+.ht-bubble.ht-partial { opacity: 0.75; }
+.ht-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: rgba(255,255,255,0.6);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: ht-blink 0.8s step-end infinite;
+}
+@keyframes ht-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
 /* end call button */
 .orb-end-call {
   display: inline-flex;
@@ -545,14 +585,16 @@ html { scroll-behavior: smooth; }
 /* ============================================================
    LOGO BAR
    ============================================================ */
+.logobar .l-container { max-width: 100%; padding: 0 120px; }
 .logobar-row {
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 32px;
+  flex-wrap: nowrap; gap: 24px;
   width: 100%;
 }
 .logo-img {
-  height: 60px !important;
+  height: 85px !important;
   width: auto !important;
+  max-width: 14%;
   object-fit: contain;
   filter: grayscale(0.3);
   opacity: 0.85;
@@ -562,8 +604,8 @@ html { scroll-behavior: smooth; }
 .logo-img:hover { filter: none; opacity: 1; transform: scale(1.05); }
 
 @media (max-width: 720px) {
-  .logobar-row { justify-content: center; gap: 28px; }
-  .logo-img { height: 44px !important; }
+  .logobar-row { justify-content: center; gap: 28px; padding: 0; }
+  .logo-img { height: 65px !important; }
 }
 
 /* shared keyframes used by hero transcript */
@@ -738,9 +780,10 @@ html { scroll-behavior: smooth; }
    RESPONSIVE
    ============================================================ */
 @media (max-width: 980px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-  .hero-grid { grid-template-rows: auto auto; }
-  .orb-wrap { min-height: auto; }
+  .l-hero .hero-grid { grid-template-columns: 1fr; }
+  .hero-copy { grid-column: 1; grid-row: auto; padding-top: 0; }
+  .orb-wrap { grid-column: 1; grid-row: auto; justify-self: center; }
+  .hero-call-transcript { grid-column: 1; grid-row: auto; }
   .hero-transcript { max-width: 100%; }
   .features-grid, .steps, .pricing-grid, .tcards { grid-template-columns: 1fr 1fr; }
   .feature.wide { grid-column: span 2; }
@@ -757,7 +800,7 @@ html { scroll-behavior: smooth; }
   .l-nav-toggle { display: grid; place-items: center; }
   .features-grid, .steps, .pricing-grid, .tcards, .usecases { grid-template-columns: 1fr; }
   .feature.wide { grid-column: span 1; }
-  .hero-grid { padding-top: 100px; }
+  .l-hero .hero-grid { padding-top: 100px; }
   .hero-sub { font-size: 17px; }
   .cta-band { padding: 50px 26px; }
   .stats-band { grid-template-columns: 1fr 1fr; padding: 40px 24px; }

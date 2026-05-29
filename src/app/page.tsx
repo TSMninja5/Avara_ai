@@ -199,6 +199,7 @@ function Hero() {
   // Vapi call state
   const [callStatus, setCallStatus] = useState<"idle" | "connecting" | "active" | "ended">("idle");
   const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
+  const [partial, setPartial] = useState<{ role: string; text: string } | null>(null);
   const [callTimer, setCallTimer] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vapiRef = useRef<any>(null);
@@ -213,11 +214,11 @@ function Hero() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [callStatus]);
 
-  // Auto-scroll transcript
+  // Auto-scroll transcript (on finalized lines AND partial updates)
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [transcript]);
+  }, [transcript, partial]);
 
   const startCall = useCallback(async () => {
     const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
@@ -244,11 +245,16 @@ function Hero() {
         if (timerRef.current) clearInterval(timerRef.current);
       });
       vapi.on("message", (msg: { type: string; role?: string; transcript?: string; transcriptType?: string }) => {
-        if (msg.type === "transcript" && msg.transcriptType === "final" && msg.transcript) {
-          setTranscript((prev) => [...prev, {
-            role: msg.role === "assistant" ? "agent" : "caller",
-            text: msg.transcript!,
-          }]);
+        if (msg.type === "transcript" && msg.transcript) {
+          const role = msg.role === "assistant" ? "agent" : "caller";
+          if (msg.transcriptType === "partial") {
+            // Live update — show words as they're spoken
+            setPartial({ role, text: msg.transcript });
+          } else if (msg.transcriptType === "final") {
+            // Finalized — commit to transcript and clear partial
+            setTranscript((prev) => [...prev, { role, text: msg.transcript! }]);
+            setPartial(null);
+          }
         }
       });
 
@@ -267,6 +273,7 @@ function Hero() {
   const resetCall = useCallback(() => {
     setCallStatus("idle");
     setTranscript([]);
+    setPartial(null);
     setCallTimer(0);
     vapiRef.current = null;
   }, []);
@@ -283,7 +290,8 @@ function Hero() {
       <div className="hero-overlay" />
 
       <div className="l-container hero-grid">
-        <div className="reveal in">
+        {/* Left column — copy */}
+        <div className="hero-copy reveal in">
           <h1>
             Never miss a<br />
             customer call <span className="grad-text">again.</span>
@@ -303,8 +311,8 @@ function Hero() {
           </div>
         </div>
 
+        {/* Center (or right when idle) column — orb */}
         <div className={`orb-wrap reveal in ${isCalling ? "calling" : ""}`}>
-          {/* The orb — click to call */}
           <div
             className="orb"
             onClick={isIdle ? startCall : undefined}
@@ -345,26 +353,6 @@ function Hero() {
             </div>
           )}
 
-          {/* Transcript panel */}
-          {(isCalling || callStatus === "ended") && (
-            <div className="hero-transcript" ref={scrollRef}>
-              {callStatus === "connecting" && (
-                <div className="ht-bubble agent">
-                  <div className="typing"><span /><span /><span /></div>
-                </div>
-              )}
-              {transcript.map((line, i) => (
-                <div key={i} className={`ht-bubble ${line.role}`}>
-                  <span className="ht-role">{line.role === "agent" ? "AI" : "You"}</span>
-                  {line.text}
-                </div>
-              ))}
-              {callStatus === "active" && transcript.length === 0 && (
-                <div className="ht-empty">Speak &mdash; the AI is listening...</div>
-              )}
-            </div>
-          )}
-
           {/* End call button */}
           {callStatus === "active" && (
             <button className="orb-end-call" onClick={endCall}>
@@ -377,6 +365,37 @@ function Hero() {
             <button className="orb-cta" onClick={resetCall}>
               <Phone width={14} height={14} /> Call again
             </button>
+          )}
+        </div>
+
+        {/* Right column — always present so grid never shifts */}
+        <div className="hero-call-transcript">
+          {(isCalling || callStatus === "ended") ? (
+            <div className="hero-transcript" ref={scrollRef}>
+              {callStatus === "connecting" && !partial && transcript.length === 0 && (
+                <div className="ht-bubble agent">
+                  <div className="typing"><span /><span /><span /></div>
+                </div>
+              )}
+              {transcript.map((line, i) => (
+                <div key={i} className={`ht-bubble ${line.role}`}>
+                  <span className="ht-role">{line.role === "agent" ? "AI" : "You"}</span>
+                  {line.text}
+                </div>
+              ))}
+              {/* Live partial — updates word by word as you or the AI speak */}
+              {partial && (
+                <div className={`ht-bubble ${partial.role} ht-partial`}>
+                  <span className="ht-role">{partial.role === "agent" ? "AI" : "You"}</span>
+                  {partial.text}<span className="ht-cursor" />
+                </div>
+              )}
+              {callStatus === "active" && transcript.length === 0 && !partial && (
+                <div className="ht-empty">Speak &mdash; the AI is listening...</div>
+              )}
+            </div>
+          ) : (
+            <div className="hero-transcript-placeholder" />
           )}
         </div>
 
