@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 /* ────────────────────────────────────────────────────
    HOOKS
@@ -131,12 +132,6 @@ const MenuIcon = (p: IconProps) => (
 const Mic = (p: IconProps) => (
   <svg {...svgBase} {...p}><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v4" /></svg>
 );
-const Volume = (p: IconProps) => (
-  <svg {...svgBase} {...p} width="16" height="16"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
-);
-const VolumeOff = (p: IconProps) => (
-  <svg {...svgBase} {...p} width="16" height="16"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="M22 9l-6 6M16 9l6 6" /></svg>
-);
 
 /* ────────────────────────────────────────────────────
    BRAND MARK
@@ -168,12 +163,12 @@ function Navbar() {
     <nav className={`l-nav ${scrolled ? "scrolled" : ""}`}>
       <div className="l-container l-nav-inner">
         <a href="#top" className="l-brand">
-          <BrandMark />
-          Golden Robin
+          <Image src="/logos/aria.png" alt="Aria" width={32} height={32} className="brand-logo" />
+          Aria
         </a>
         <div className="l-nav-links">
+          <a href="#features">Capabilities</a>
           <a href="#how">How it works</a>
-          <a href="#features">Features</a>
           <a href="#usecases">Use cases</a>
           <a href="#pricing">Pricing</a>
         </div>
@@ -193,6 +188,12 @@ function Navbar() {
    HERO
    ──────────────────────────────────────────────────── */
 const heroBars = [18, 30, 22, 38, 26, 16, 32, 24, 12];
+
+function fmt(sec: number) {
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
 
 function Hero() {
   // Vapi call state
@@ -283,16 +284,12 @@ function Hero() {
 
       <div className="l-container hero-grid">
         <div className="reveal in">
-          <span className="hero-badge">
-            <span className="tag">NEW</span>
-            <b>Golden Robin 2.0</b> — sub-second response, human-grade tone
-          </span>
           <h1>
             Never miss a<br />
             customer call <span className="grad-text">again.</span>
           </h1>
           <p className="hero-sub">
-            Golden Robin builds tailor-fit AI voice agents that pick up every call for your
+            Aria builds tailor-fit AI voice agents that pick up every call for your
             business — booking appointments, quoting prices, and checking inventory in
             real time. No hold music. No voicemail. No lost revenue.
           </p>
@@ -300,8 +297,8 @@ function Hero() {
             <Link className="l-btn l-btn-primary l-btn-lg" href="/sign-up">
               Get started free <Arrow className="arrow" width={18} height={18} />
             </Link>
-            <a className="l-btn l-btn-ghost l-btn-lg" href="#demo">
-              <Phone width={17} height={17} /> Hear it in action
+            <a className="l-btn l-btn-ghost l-btn-lg" href="#how">
+              See how it works
             </a>
           </div>
         </div>
@@ -383,11 +380,6 @@ function Hero() {
           )}
         </div>
 
-        {/* Trust bar — anchored at the bottom of the hero viewport */}
-        <div className="hero-trust">
-          <div className="dots"><span /><span /><span /><span /></div>
-          Trusted by 400+ service businesses answering 2M+ calls a month
-        </div>
       </div>
     </header>
   );
@@ -396,342 +388,35 @@ function Hero() {
 /* ────────────────────────────────────────────────────
    LOGO BAR
    ──────────────────────────────────────────────────── */
-const logos = ["Canadian Tire", "Midas", "Jiffy Lube", "PartSource", "Mr. Lube", "Kal Tire"];
+const logos = [
+  { name: "Canadian Tire", src: "/logos/canadian-tire.png", w: 120, h: 120 },
+  { name: "PartSource",    src: "/logos/partsource.svg",   w: 160, h: 50 },
+  { name: "Kal Tire",      src: "/logos/kal-tire.png",     w: 160, h: 45 },
+  { name: "Mr. Lube",      src: "/logos/mr-lube.jpg",      w: 160, h: 50 },
+  { name: "NAPA Auto Parts", src: "/logos/napa.png",       w: 120, h: 120 },
+  { name: "Speedy Auto Service", src: "/logos/speedy.jpg", w: 180, h: 60 },
+];
 
 function LogoBar() {
   return (
-    <section className="logobar">
+    <section className="l-section-sm logobar" id="built-for">
       <div className="l-container">
-        <p>Powering front-desk calls for service businesses across North America</p>
-        <div className="logobar-row">
+        <div className="section-head reveal">
+          <span className="eyebrow">Built for</span>
+          <h2>Service businesses like</h2>
+          <p>We&apos;re building Aria for the brands that run on phone calls.</p>
+        </div>
+        <div className="logobar-row reveal">
           {logos.map((l) => (
-            <span className="logo" key={l}>
-              <span className="dot" /> {l}
-            </span>
+            <Image
+              key={l.name}
+              src={l.src}
+              alt={l.name}
+              width={l.w}
+              height={l.h}
+              className="logo-img"
+            />
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ────────────────────────────────────────────────────
-   DEMO — Simulated + Live Vapi Call
-   ──────────────────────────────────────────────────── */
-
-type Line = { s: "agent" | "caller"; t: string };
-
-const scenarios = [
-  {
-    id: "appt",
-    icon: Calendar,
-    title: "Book a service appointment",
-    desc: "Customer wants a seasonal tire change",
-    outcome: "Appointment booked — Tue, May 28 · 2:30 PM",
-    lines: [
-      { s: "agent" as const, t: "Thanks for calling Canadian Tire Auto Service, this is Alex. How can I help you today?" },
-      { s: "caller" as const, t: "Hi, I need to get my winter tires swapped over to summers." },
-      { s: "agent" as const, t: "Happy to set that up. Can I grab your year, make and model so I pull the right service?" },
-      { s: "caller" as const, t: "It's a 2021 Honda CR-V." },
-      { s: "agent" as const, t: "Perfect. A seasonal changeover on the CR-V runs about 45 minutes. I have openings tomorrow at 10:15 AM or 2:30 PM. Which works better?" },
-      { s: "caller" as const, t: "Afternoon's better, let's do 2:30." },
-      { s: "agent" as const, t: "Done — Tuesday at 2:30 with our tire bay. I'll text you a confirmation and a reminder the morning of. Anything else?" },
-      { s: "caller" as const, t: "Nope, that's great. Thanks!" },
-    ],
-  },
-  {
-    id: "price",
-    icon: BoxIcon,
-    title: "Check price & live inventory",
-    desc: "Customer asks about a product in stock",
-    outcome: "Item located · 7 in stock · held for pickup",
-    lines: [
-      { s: "agent" as const, t: "Canadian Tire, this is Alex. What can I help you find?" },
-      { s: "caller" as const, t: "Do you have the MotoMaster Eliminator battery for a Ford F-150 in stock?" },
-      { s: "agent" as const, t: "Let me check live inventory. Yes — the Eliminator Group 65 fits your F-150. We have 7 in stock at the Barrie location." },
-      { s: "caller" as const, t: "How much is it?" },
-      { s: "agent" as const, t: "It's 239.99 right now, and it's on promo this week with 40 dollars off when you trade in your old battery." },
-      { s: "caller" as const, t: "Oh nice. Can you hold one for me?" },
-      { s: "agent" as const, t: "Already done — I've reserved one under your number for pickup today. Just see the service desk when you arrive." },
-    ],
-  },
-  {
-    id: "after",
-    icon: Clock,
-    title: "After-hours inquiry",
-    desc: "Call comes in at 11 PM, store is closed",
-    outcome: "Lead captured · callback scheduled 8:05 AM",
-    lines: [
-      { s: "agent" as const, t: "Thanks for calling Canadian Tire. We're closed for the evening, but I can still help — this is Alex." },
-      { s: "caller" as const, t: "Oh, I didn't realize it was so late. My car won't start and I need it looked at." },
-      { s: "agent" as const, t: "I'm sorry to hear that. I can book you the first diagnostic slot tomorrow and arrange a tow partner if you need one tonight." },
-      { s: "caller" as const, t: "Yeah, please book the morning slot." },
-      { s: "agent" as const, t: "You're in at 8 AM for a no-start diagnostic. I've also flagged your file so a service advisor calls you back at 8:05 to confirm the tow. You're all set." },
-      { s: "caller" as const, t: "Wow, thank you — that's a relief." },
-    ],
-  },
-];
-
-function fmt(sec: number) {
-  const m = String(Math.floor(sec / 60)).padStart(2, "0");
-  const s = String(sec % 60).padStart(2, "0");
-  return `${m}:${s}`;
-}
-
-const FEMALE = ["female", "samantha", "victoria", "karen", "moira", "tessa", "fiona", "zira", "jenny",
-  "aria", "michelle", "ava", "allison", "susan", "serena", "catherine", "linda", "heather", "hazel",
-  "sonia", "natasha", "clara", "emily", "amber", "jane", "nova", "libby", "zuzana", "google us english"];
-const MALE = ["male", "daniel", "alex", "fred", "thomas", "tom", "aaron", "david", "mark", "guy",
-  "rishi", "ryan", "eric", "arthur", "george", "james", "liam", "oliver", "william", "gordon", "lee",
-  "jacob", "brandon", "christopher", "diego", "davis", "tony", "jason", "google uk english male"];
-
-type VoiceProfile = { voice: SpeechSynthesisVoice; rate: number; pitch: number };
-type VoicePlan = { agent: VoiceProfile; caller: VoiceProfile }[];
-
-function buildVoicePlan(allVoices: SpeechSynthesisVoice[]): VoicePlan | null {
-  const en = allVoices.filter((v) => /^en(-|_|$)/i.test(v.lang));
-  const pool = (en.length ? en : allVoices).slice();
-  if (!pool.length) return null;
-
-  const quality = (v: SpeechSynthesisVoice) => {
-    const n = v.name.toLowerCase();
-    let s = 0;
-    if (/natural|neural/.test(n)) s += 120;
-    if (/online/.test(n)) s += 90;
-    if (/premium|enhanced|siri/.test(n)) s += 80;
-    if (/google/.test(n)) s += 70;
-    if (/microsoft/.test(n)) s += 40;
-    if (v.localService === false) s += 30;
-    return s;
-  };
-  const ranked = pool.sort((a, b) => quality(b) - quality(a));
-  const has = (v: SpeechSynthesisVoice, list: string[]) => list.some((n) => v.name.toLowerCase().includes(n));
-
-  let females = ranked.filter((v) => has(v, FEMALE));
-  let males = ranked.filter((v) => has(v, MALE));
-  const rest = ranked.filter((v) => !females.includes(v) && !males.includes(v));
-  rest.forEach((v, i) => (i % 2 ? males : females).push(v));
-  if (!females.length) females = ranked.slice();
-  if (!males.length) males = ranked.slice();
-
-  const pick = (arr: SpeechSynthesisVoice[], i: number) => (arr.length ? arr[i % arr.length] : ranked[0]);
-
-  return [
-    { agent: { voice: pick(females, 0), rate: 1.0, pitch: 1.06 }, caller: { voice: pick(males, 0), rate: 1.0, pitch: 0.92 } },
-    { agent: { voice: pick(males, 1), rate: 1.07, pitch: 0.99 }, caller: { voice: pick(females, 1), rate: 1.03, pitch: 1.08 } },
-    { agent: { voice: pick(females, 2), rate: 0.96, pitch: 1.0 }, caller: { voice: pick(males, 2), rate: 0.94, pitch: 0.84 } },
-  ];
-}
-
-function Demo() {
-  const [active, setActive] = useState(0);
-  const [soundOn, setSoundOn] = useState(false);
-  const [visible, setVisible] = useState<Line[]>([]);
-  const [typing, setTyping] = useState(false);
-  const [speaking, setSpeaking] = useState<number | null>(null);
-  const [done, setDone] = useState(false);
-  const [timer, setTimer] = useState(0);
-  const [speechSupported, setSpeechSupported] = useState(false);
-
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const runId = useRef(0);
-  const voicePlan = useRef<VoicePlan | null>(null);
-
-  const scenario = scenarios[active];
-
-  // Detect speech synthesis support after mount (avoids hydration mismatch)
-  useEffect(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      setSpeechSupported(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!speechSupported) return;
-    const load = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length) voicePlan.current = buildVoicePlan(voices);
-    };
-    load();
-    window.speechSynthesis.addEventListener("voiceschanged", load);
-    return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
-  }, []);
-
-  // Simulated demo playback
-  useEffect(() => {
-    const myRun = ++runId.current;
-    const lines = scenario.lines;
-
-    setVisible([]);
-    setTyping(false);
-    setDone(false);
-    setSpeaking(null);
-    setTimer(0);
-    timers.current.forEach(clearTimeout);
-    timers.current = [];
-    if (tickRef.current) clearInterval(tickRef.current);
-    if (speechSupported) window.speechSynthesis.cancel();
-
-    const stale = () => myRun !== runId.current;
-    const after = (ms: number, fn: () => void) =>
-      timers.current.push(setTimeout(() => { if (!stale()) fn(); }, ms));
-
-    tickRef.current = setInterval(() => setTimer((t) => t + 1), 1000);
-
-    const speakLine = (line: Line, onDone: () => void) => {
-      const synth = window.speechSynthesis;
-      const u = new SpeechSynthesisUtterance(line.t);
-      const plan = voicePlan.current;
-      const prof = plan && plan[active] ? plan[active][line.s] : null;
-      const v = prof && prof.voice;
-      if (v) u.voice = v;
-      u.lang = (v && v.lang) || "en-US";
-      u.rate = prof ? prof.rate : line.s === "agent" ? 1.0 : 0.96;
-      u.pitch = prof ? prof.pitch : line.s === "agent" ? 1.05 : 0.9;
-      u.volume = 1;
-      let finished = false;
-      const finish = () => { if (finished || stale()) return; finished = true; onDone(); };
-      u.onend = finish;
-      u.onerror = finish;
-      after(Math.min(line.t.length * 78 + 1600, 13000), finish);
-      synth.resume();
-      synth.speak(u);
-    };
-
-    const reveal = (i: number, line: Line) => {
-      setVisible((v) => [...v, line]);
-      if (soundOn && speechSupported) {
-        setSpeaking(i);
-        speakLine(line, () => {
-          setSpeaking(null);
-          after(340, () => playLine(i + 1));
-        });
-      } else {
-        const ms = line.s === "agent"
-          ? Math.min(950 + line.t.length * 32, 3400)
-          : Math.min(720 + line.t.length * 28, 2700);
-        after(ms, () => playLine(i + 1));
-      }
-    };
-
-    const playLine = (i: number) => {
-      if (stale()) return;
-      if (i >= lines.length) {
-        setDone(true);
-        if (tickRef.current) clearInterval(tickRef.current);
-        after(4800, () => setActive((a) => (a + 1) % scenarios.length));
-        return;
-      }
-      const line = lines[i];
-      if (line.s === "agent") {
-        setTyping(true);
-        after(720, () => { setTyping(false); reveal(i, line); });
-      } else {
-        after(440, () => reveal(i, line));
-      }
-    };
-
-    after(500, () => playLine(0));
-
-    return () => {
-      runId.current++;
-      timers.current.forEach(clearTimeout);
-      if (tickRef.current) clearInterval(tickRef.current);
-      if (speechSupported) window.speechSynthesis.cancel();
-    };
-  }, [active, soundOn]);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [visible, typing, done]);
-
-  return (
-    <section className="l-section" id="demo">
-      <div className="l-container demo-grid">
-        <div className="demo-copy reveal">
-          <span className="eyebrow">Live demo</span>
-          <h2>Listen to Golden Robin handle a real call.</h2>
-          <p>
-            This is the actual flow — your agent answers instantly, understands intent,
-            taps your live systems, and gets the job done. Pick a scenario to listen.
-          </p>
-          <div className="demo-scenarios">
-            {scenarios.map((sc, i) => {
-              const Ico = sc.icon;
-              return (
-                <button
-                  key={sc.id}
-                  className={`scenario-btn ${i === active ? "active" : ""}`}
-                  onClick={() => setActive(i)}
-                >
-                  <span className="s-ico"><Ico width={18} height={18} /></span>
-                  <span className="s-meta">
-                    <span className="s-title">{sc.title}</span>
-                    <span className="s-desc">{sc.desc}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="reveal">
-          <div className="phone">
-            <div className="phone-head">
-              <div className="phone-avatar">G</div>
-              <div className="who">
-                <b>Golden Robin &middot; Canadian Tire</b>
-                <span>
-                  <span className="live-dot" />
-                  Live call
-                </span>
-              </div>
-              <div className="phone-timer">{fmt(timer)}</div>
-              {speechSupported && (
-                <button
-                  className={`sound-toggle ${soundOn ? "on" : "off"}`}
-                  onClick={() => setSoundOn((s) => !s)}
-                  aria-label={soundOn ? "Mute call" : "Play call with sound"}
-                >
-                  <span className="pinger">{soundOn ? <Volume /> : <VolumeOff />}</span>
-                  {soundOn ? "Sound on" : "Sound"}
-                </button>
-              )}
-            </div>
-
-            <div className="transcript" ref={scrollRef}>
-              {visible.map((line, i) => (
-                <div key={i} className={`bubble ${line.s} ${speaking === i ? "speaking" : ""}`}>
-                  <div className="speaker">{line.s === "agent" ? "Golden Robin" : "Caller"}</div>
-                  {line.t}
-                </div>
-              ))}
-              {typing && (
-                <div className="bubble agent">
-                  <div className="typing"><span /><span /><span /></div>
-                </div>
-              )}
-              {done && (
-                <div className="outcome">
-                  <CheckIcon width={16} height={16} /> {scenario.outcome}
-                </div>
-              )}
-            </div>
-
-            <div className="phone-foot">
-              <div className="mini-wave" aria-hidden="true">
-                {[12, 18, 9, 20, 14, 8, 16].map((h, i) => (
-                  <span key={i} style={{ height: h, animationDelay: `${i * 0.08}s` }} />
-                ))}
-              </div>
-              <button className="call-btn" aria-label="End call">
-                <PhoneOff width={20} height={20} />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -742,12 +427,12 @@ function Demo() {
    FEATURES
    ──────────────────────────────────────────────────── */
 const features = [
-  { icon: Brain, title: "Trained on your business", desc: "Golden Robin learns your services, hours, pricing, policies and tone — so it answers like your best employee, not a generic bot.", wide: true },
+  { icon: Brain, title: "Trained on your business", desc: "Aria learns your services, hours, pricing, policies and tone — so it answers like your best employee, not a generic bot.", wide: true },
   { icon: Bolt, title: "Sub-second response", desc: "Natural, uninterrupted conversation with no awkward lag. Callers feel heard, not handled." },
   { icon: Calendar, title: "Books appointments", desc: "Reads your live calendar, offers real openings, and writes the booking back automatically." },
   { icon: BoxIcon, title: "Checks live inventory", desc: "Looks up stock and pricing in real time and can reserve items for pickup on the spot." },
   { icon: Plug, title: "Connects to your stack", desc: "Plugs into your POS, CRM, scheduling and phone system. Works with the tools you already run." },
-  { icon: Handoff, title: "Knows when to hand off", desc: "For anything sensitive or out of scope, Golden Robin transfers to the right person — with full call context, so customers never repeat themselves." },
+  { icon: Handoff, title: "Knows when to hand off", desc: "For anything sensitive or out of scope, Aria transfers to the right person — with full call context, so customers never repeat themselves." },
   { icon: Chart, title: "Every call, captured", desc: "Full transcripts, intent tags, sentiment and outcomes — searchable in one dashboard." },
   { icon: Shield, title: "Secure & compliant", desc: "SOC 2 Type II, PCI-aware call handling, and PIPEDA/GDPR-ready data controls by default." },
 ];
@@ -782,8 +467,8 @@ function Features() {
    HOW IT WORKS
    ──────────────────────────────────────────────────── */
 const steps = [
-  { n: "01", title: "Connect your number", desc: "Forward your existing line or get a new one. Golden Robin starts answering overflow, after-hours, or every call — your call." },
-  { n: "02", title: "Train on your business", desc: "Point Golden Robin at your website, price lists, calendar and systems. It builds a tailor-fit agent in minutes, not months." },
+  { n: "01", title: "Connect your number", desc: "Forward your existing line or get a new one. Aria starts answering overflow, after-hours, or every call — your call." },
+  { n: "02", title: "Train on your business", desc: "Point Aria at your website, price lists, calendar and systems. It builds a tailor-fit agent in minutes, not months." },
   { n: "03", title: "Go live & watch it work", desc: "Your agent handles calls 24/7. Review transcripts, outcomes and bookings from one dashboard, and refine anytime." },
 ];
 
@@ -794,7 +479,7 @@ function HowItWorks() {
         <div className="section-head reveal">
           <span className="eyebrow">How it works</span>
           <h2>Live in a day, not a quarter</h2>
-          <p>No integration team required. If you can describe how your front desk works, Golden Robin can run it.</p>
+          <p>No integration team required. If you can describe how your front desk works, Aria can run it.</p>
         </div>
         <div className="steps">
           {steps.map((s, i) => (
@@ -832,7 +517,7 @@ function UseCases() {
         <div className="section-head reveal">
           <span className="eyebrow">Built for</span>
           <h2>Any business that lives on the phone</h2>
-          <p>If customers call you to book, buy or ask — Golden Robin makes sure someone always answers.</p>
+          <p>If customers call you to book, buy or ask — Aria makes sure someone always answers.</p>
         </div>
         <div className="usecases">
           {useCases.map((c, i) => (
@@ -939,7 +624,7 @@ function Pricing() {
    TESTIMONIALS
    ──────────────────────────────────────────────────── */
 const quotes = [
-  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. Golden Robin picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Service Manager, Auto Centre" },
+  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. Aria picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Service Manager, Auto Centre" },
   { quote: "Customers honestly can't tell it's AI. It knows our pricing, checks stock, and reserves parts before they even hang up. Our advisors finally have time to sell.", name: "Priya Raman", role: "Operations Lead, Retail Group" },
   { quote: "After-hours used to be dead air. Now we wake up to a list of booked appointments and captured leads. It's like hiring a night shift that never sleeps.", name: "Marc Tremblay", role: "Owner, Northgate Tire & Auto" },
 ];
@@ -982,7 +667,7 @@ function CTA() {
         <div className="cta-band reveal">
           <h2>Stop losing customers<br />to hold music.</h2>
           <p>
-            See Golden Robin answer a live call for your business. Book a 15-minute demo and we&apos;ll
+            See Aria answer a live call for your business. Book a 15-minute demo and we&apos;ll
             spin up an agent trained on your shop — on the call.
           </p>
           <div className="cta-actions">
@@ -1019,8 +704,8 @@ function Footer() {
         <div className="footer-grid">
           <div>
             <a href="#top" className="l-brand">
-              <BrandMark />
-              Golden Robin
+              <Image src="/logos/aria.png" alt="Aria" width={32} height={32} className="brand-logo" />
+              Aria
             </a>
             <p className="footer-blurb">
               Tailor-fit AI voice agents that answer every call for your business — so no
@@ -1037,7 +722,7 @@ function Footer() {
           ))}
         </div>
         <div className="footer-bottom">
-          <span>&copy; {new Date().getFullYear()} Golden Robin Technologies Inc. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} Aria Technologies Inc. All rights reserved.</span>
           <div className="footer-social">
             <a href="#" aria-label="X"><Social d="M18.9 2H22l-7.3 8.3L23 22h-6.5l-5-6.6L5.6 22H2.5l7.8-8.9L1.7 2h6.6l4.6 6 5-6zm-2.3 18h1.8L7.5 3.8H5.6L16.6 20z" /></a>
             <a href="#" aria-label="LinkedIn"><Social d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21H9z" /></a>
@@ -1061,7 +746,6 @@ export default function HomePage() {
       <main>
         <Hero />
         <LogoBar />
-        <Demo />
         <Features />
         <HowItWorks />
         <UseCases />

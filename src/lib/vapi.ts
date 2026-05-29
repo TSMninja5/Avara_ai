@@ -94,7 +94,7 @@ export function buildAssistantConfig(business: {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   return {
-    name: `${business.name} - Golden Robin`,
+    name: `${business.name} - Aria`,
     model: {
       provider: "google",
       model: "gemini-2.0-pro",

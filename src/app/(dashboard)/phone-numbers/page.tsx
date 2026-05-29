@@ -76,10 +76,10 @@ export default async function PhoneNumbersPage() {
 
       <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
         <p className="text-sm text-gray-500">
-          Need to forward your existing business number to Golden Robin?
+          Need to forward your existing business number to Aria?
         </p>
         <p className="mt-1 text-xs text-gray-400">
-          On most carriers, dial *72 followed by your Golden Robin number to
+          On most carriers, dial *72 followed by your Aria number to
           activate call forwarding. Dial *73 to deactivate.
         </p>
       </div>

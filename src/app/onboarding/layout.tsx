@@ -8,9 +8,9 @@ export default function OnboardingLayout({
       <header className="border-b bg-white">
         <div className="mx-auto flex h-16 items-center gap-2 px-6">
           <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">GR</span>
+            <span className="text-white font-bold text-sm">A</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">Golden Robin</span>
+          <span className="text-lg font-bold text-gray-900">Aria</span>
         </div>
       </header>
       <main className="flex flex-1 items-start justify-center py-10 px-4">
