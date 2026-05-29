@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "../styles/landing.css";
+
+@theme inline {
+  --color-ivory: #FAFAF9;
+  --color-cream: #F5F0E8;
+  --color-parchment: #EDE8DF;
+  --color-sand: #D4C5B2;
+
+  --color-taupe: #8A7E72;
+  --color-stone-warm: #6B5E52;
+
+  --color-navy: #1B2A4A;
+  --color-navy-light: #243660;
+  --color-navy-dark: #111D33;
+
+  --color-emerald: #2D6A4F;
+
+  --color-burgundy: #722F37;
+
+  --color-cognac: #9A4E2C;
+  --color-cognac-light: #B5633A;
+
+  --color-gold: #CA8A04;
+  --color-gold-muted: #A67C37;
+
+  --font-heading: var(--font-cormorant), "Georgia", serif;
+  --font-body: var(--font-montserrat), system-ui, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}

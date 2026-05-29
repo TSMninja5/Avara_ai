@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanTier {
+  STARTER
+  GROWTH
+  AGENCY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum CallStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  NO_ANSWER
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model User {
+  id             String        @id @default(cuid())
+  clerkId        String        @unique
+  email          String        @unique
+  firstName      String?
+  lastName       String?
+  phone          String?
+  onboardingDone Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  businesses   Business[]
+  subscription Subscription?
+
+  @@index([clerkId])
+}
+
+model Business {
+  id              String  @id @default(cuid())
+  userId          String
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            String
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  timezone        String  @default("America/New_York")
+  website         String?
+  greetingMessage String?
+  aiPersonality   String? @default("professional")
+  vapiAssistantId String? @unique
+  vapiSquadId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  businessHours BusinessHours[]
+  services      Service[]
+  faqs          FAQ[]
+  phoneNumbers  PhoneNumber[]
+  calls         Call[]
+
+  @@index([userId])
+}
+
+model BusinessHours {
+  id         String    @id @default(cuid())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  dayOfWeek  DayOfWeek
+  openTime   String
+  closeTime  String
+  isClosed   Boolean   @default(false)
+
+  @@unique([businessId, dayOfWeek])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  priceRange  String?
+  duration    String?
+  createdAt   DateTime @default(now())
+
+  @@index([businessId])
+}
+
+model FAQ {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  question   String
+  answer     String
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}
+
+model PhoneNumber {
+  id           String   @id @default(cuid())
+  businessId   String
+  business     Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  number       String   @unique
+  vapiPhoneId  String   @unique
+  friendlyName String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  calls Call[]
+
+  @@index([businessId])
+  @@index([vapiPhoneId])
+}
+
+model Call {
+  id              String        @id @default(cuid())
+  businessId      String
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  phoneNumberId   String?
+  phoneNumber     PhoneNumber?  @relation(fields: [phoneNumberId], references: [id], onDelete: SetNull)
+  vapiCallId      String        @unique
+  callerNumber    String?
+  callerName      String?
+  direction       CallDirection @default(INBOUND)
+  status          CallStatus    @default(IN_PROGRESS)
+  startedAt       DateTime
+  endedAt         DateTime?
+  durationSeconds Int?
+  summary         String?
+  sentiment       String?
+  actionItems     String?
+  endedReason     String?
+  recordingUrl    String?
+  stereoRecordingUrl String?
+  smsSentAt       DateTime?
+  smsStatus       String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  transcript Transcript?
+
+  @@index([businessId])
+  @@index([vapiCallId])
+  @@index([startedAt])
+  @@index([businessId, startedAt])
+}
+
+model Transcript {
+  id       String @id @default(cuid())
+  callId   String @unique
+  call     Call   @relation(fields: [callId], references: [id], onDelete: Cascade)
+  messages Json
+  fullText String?
+
+  createdAt DateTime @default(now())
+
+  @@index([callId])
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            PlanTier           @default(STARTER)
+  status          SubscriptionStatus @default(ACTIVE)
+  maxPhoneNumbers Int                @default(1)
+  maxMinutes      Int                @default(200)
+  overageRate     Float              @default(0.15)
+
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usageRecords UsageRecord[]
+}
+
+model UsageRecord {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  periodStart    DateTime
+  periodEnd      DateTime
+  minutesUsed    Float        @default(0)
+  callCount      Int          @default(0)
+  overageMinutes Float        @default(0)
+  overageCost    Float        @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([subscriptionId, periodStart])
+  @@index([subscriptionId])
+  @@index([periodStart])
+}
