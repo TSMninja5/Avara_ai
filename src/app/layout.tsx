@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Sora, Cormorant, Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -42,15 +41,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${inter.variable} ${sora.variable} ${cormorant.variable} ${montserrat.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col">
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang="en"
+      className={`${inter.variable} ${sora.variable} ${cormorant.variable} ${montserrat.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">
+        {children}
+      </body>
+    </html>
   );
 }
