@@ -4,6 +4,9 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+/* Base path for GitHub Pages — must match next.config.ts basePath */
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 /* ────────────────────────────────────────────────────
    HOOKS
    ──────────────────────────────────────────────────── */
@@ -163,7 +166,7 @@ function Navbar() {
     <nav className={`l-nav ${scrolled ? "scrolled" : ""}`}>
       <div className="l-container l-nav-inner">
         <a href="#top" className="l-brand">
-          <Image src="/logos/aria.png" alt="Aria" width={32} height={32} className="brand-logo" />
+          <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
           Aria
         </a>
         <div className="l-nav-links">
@@ -285,7 +288,7 @@ function Hero() {
     <header className="l-hero" id="top">
       {/* Background video */}
       <video className="hero-video" autoPlay loop muted playsInline>
-        <source src="/hero-bg.mp4" type="video/mp4" />
+        <source src={`${BASE}/hero-bg.mp4`} type="video/mp4" />
       </video>
       <div className="hero-overlay" />
 
@@ -408,12 +411,12 @@ function Hero() {
    LOGO BAR
    ──────────────────────────────────────────────────── */
 const logos = [
-  { name: "Canadian Tire", src: "/logos/canadian-tire.png", w: 120, h: 120 },
-  { name: "PartSource",    src: "/logos/partsource.svg",   w: 160, h: 50 },
-  { name: "Kal Tire",      src: "/logos/kal-tire.png",     w: 160, h: 45 },
-  { name: "Mr. Lube",      src: "/logos/mr-lube.jpg",      w: 160, h: 50 },
-  { name: "NAPA Auto Parts", src: "/logos/napa.png",       w: 120, h: 120 },
-  { name: "Speedy Auto Service", src: "/logos/speedy.jpg", w: 180, h: 60 },
+  { name: "Canadian Tire", src: `${BASE}/logos/canadian-tire.png`, w: 120, h: 120 },
+  { name: "PartSource",    src: `${BASE}/logos/partsource.svg`,   w: 160, h: 50 },
+  { name: "Kal Tire",      src: `${BASE}/logos/kal-tire.png`,     w: 160, h: 45 },
+  { name: "Mr. Lube",      src: `${BASE}/logos/mr-lube.jpg`,      w: 160, h: 50 },
+  { name: "NAPA Auto Parts", src: `${BASE}/logos/napa.png`,       w: 120, h: 120 },
+  { name: "Speedy Auto Service", src: `${BASE}/logos/speedy.jpg`, w: 180, h: 60 },
 ];
 
 function LogoBar() {
@@ -723,7 +726,7 @@ function Footer() {
         <div className="footer-grid">
           <div>
             <a href="#top" className="l-brand">
-              <Image src="/logos/aria.png" alt="Aria" width={32} height={32} className="brand-logo" />
+              <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
               Aria
             </a>
             <p className="footer-blurb">
