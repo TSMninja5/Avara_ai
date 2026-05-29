@@ -195,20 +195,92 @@ function Navbar() {
 const heroBars = [18, 30, 22, 38, 26, 16, 32, 24, 12];
 
 function Hero() {
-  const [booked, setBooked] = useState(1284);
+  // Vapi call state
+  const [callStatus, setCallStatus] = useState<"idle" | "connecting" | "active" | "ended">("idle");
+  const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
+  const [callTimer, setCallTimer] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const vapiRef = useRef<any>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Call timer
   useEffect(() => {
-    let id: ReturnType<typeof setTimeout>;
-    const tick = () => {
-      setBooked((n) => n + 1);
-      id = setTimeout(tick, 3500 + Math.random() * 4000);
-    };
-    id = setTimeout(tick, 3500 + Math.random() * 4000);
-    return () => clearTimeout(id);
+    if (callStatus === "active") {
+      timerRef.current = setInterval(() => setCallTimer((t) => t + 1), 1000);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [callStatus]);
+
+  // Auto-scroll transcript
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [transcript]);
+
+  const startCall = useCallback(async () => {
+    const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+    if (!publicKey) {
+      alert("Vapi public key not configured.");
+      return;
+    }
+    try {
+      const VapiModule = await import("@vapi-ai/web");
+      const Vapi = VapiModule.default;
+      const vapi = new Vapi(publicKey);
+      vapiRef.current = vapi;
+      setCallStatus("connecting");
+      setTranscript([]);
+      setCallTimer(0);
+
+      vapi.on("call-start", () => setCallStatus("active"));
+      vapi.on("call-end", () => {
+        setCallStatus("ended");
+        if (timerRef.current) clearInterval(timerRef.current);
+      });
+      vapi.on("error", () => {
+        setCallStatus("ended");
+        if (timerRef.current) clearInterval(timerRef.current);
+      });
+      vapi.on("message", (msg: { type: string; role?: string; transcript?: string; transcriptType?: string }) => {
+        if (msg.type === "transcript" && msg.transcriptType === "final" && msg.transcript) {
+          setTranscript((prev) => [...prev, {
+            role: msg.role === "assistant" ? "agent" : "caller",
+            text: msg.transcript!,
+          }]);
+        }
+      });
+
+      await vapi.start("453df4ad-5987-42de-a879-6f5fd10c5796");
+    } catch {
+      setCallStatus("ended");
+    }
   }, []);
+
+  const endCall = useCallback(() => {
+    if (vapiRef.current) vapiRef.current.stop();
+    setCallStatus("ended");
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const resetCall = useCallback(() => {
+    setCallStatus("idle");
+    setTranscript([]);
+    setCallTimer(0);
+    vapiRef.current = null;
+  }, []);
+
+  const isIdle = callStatus === "idle";
+  const isCalling = callStatus === "connecting" || callStatus === "active";
 
   return (
     <header className="l-hero" id="top">
+      {/* Background video */}
+      <video className="hero-video" autoPlay loop muted playsInline>
+        <source src="/hero-bg.mp4" type="video/mp4" />
+      </video>
+      <div className="hero-overlay" />
+
       <div className="l-container hero-grid">
         <div className="reveal in">
           <span className="hero-badge">
@@ -232,41 +304,89 @@ function Hero() {
               <Phone width={17} height={17} /> Hear it in action
             </a>
           </div>
-          <div className="hero-trust">
-            <div className="dots"><span /><span /><span /><span /></div>
-            Trusted by 400+ service businesses answering 2M+ calls a month
-          </div>
         </div>
 
-        <div className="orb-wrap reveal in">
-          <div className="orb-float f1">
-            <div className="lbl">Calls answered</div>
-            <div className="val grad-text">100%</div>
-          </div>
-          <div className="orb-float f2">
-            <div className="lbl">Avg. pickup</div>
-            <div className="val">0.7s</div>
-          </div>
-          <div className="orb-float f3">
-            <div className="lbl">Appointments booked today</div>
-            <div className="val grad-text">{booked.toLocaleString()}</div>
-          </div>
-
-          <div className="orb">
+        <div className={`orb-wrap reveal in ${isCalling ? "calling" : ""}`}>
+          {/* The orb — click to call */}
+          <div
+            className="orb"
+            onClick={isIdle ? startCall : undefined}
+            role={isIdle ? "button" : undefined}
+            tabIndex={isIdle ? 0 : undefined}
+            aria-label={isIdle ? "Start a live call with our AI" : undefined}
+          >
             <span className="orb-ring" />
             <span className="orb-ring" />
             <span className="orb-ring" />
             <div className="orb-core">
-              <div className="l-wave" aria-hidden="true">
-                {heroBars.map((h, i) => (
-                  <span key={i} style={{ height: h, animationDelay: `${i * 0.09}s` }} />
-                ))}
-              </div>
+              {isCalling ? (
+                <div className="orb-mic"><Mic width={36} height={36} /></div>
+              ) : (
+                <div className="l-wave" aria-hidden="true">
+                  {heroBars.map((h, i) => (
+                    <span key={i} style={{ height: h, animationDelay: `${i * 0.09}s` }} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          <div className="l-chip" style={{ position: "absolute", bottom: 6, gap: 8 }}>
-            <Mic width={14} height={14} /> Live agent &middot; listening
-          </div>
+
+          {/* Idle — click to talk prompt */}
+          {isIdle && (
+            <button className="orb-cta" onClick={startCall}>
+              <Mic width={14} height={14} />
+              <span className="pulse-dot" />
+              Talk to our AI &mdash; try it live
+            </button>
+          )}
+
+          {/* Calling — status indicator */}
+          {isCalling && (
+            <div className="orb-status">
+              <span className="live-dot" />
+              {callStatus === "connecting" ? "Connecting..." : `Live · ${fmt(callTimer)}`}
+            </div>
+          )}
+
+          {/* Transcript panel */}
+          {(isCalling || callStatus === "ended") && (
+            <div className="hero-transcript" ref={scrollRef}>
+              {callStatus === "connecting" && (
+                <div className="ht-bubble agent">
+                  <div className="typing"><span /><span /><span /></div>
+                </div>
+              )}
+              {transcript.map((line, i) => (
+                <div key={i} className={`ht-bubble ${line.role}`}>
+                  <span className="ht-role">{line.role === "agent" ? "AI" : "You"}</span>
+                  {line.text}
+                </div>
+              ))}
+              {callStatus === "active" && transcript.length === 0 && (
+                <div className="ht-empty">Speak &mdash; the AI is listening...</div>
+              )}
+            </div>
+          )}
+
+          {/* End call button */}
+          {callStatus === "active" && (
+            <button className="orb-end-call" onClick={endCall}>
+              <PhoneOff width={16} height={16} /> End call
+            </button>
+          )}
+
+          {/* Call ended — call again */}
+          {callStatus === "ended" && (
+            <button className="orb-cta" onClick={resetCall}>
+              <Phone width={14} height={14} /> Call again
+            </button>
+          )}
+        </div>
+
+        {/* Trust bar — anchored at the bottom of the hero viewport */}
+        <div className="hero-trust">
+          <div className="dots"><span /><span /><span /><span /></div>
+          Trusted by 400+ service businesses answering 2M+ calls a month
         </div>
       </div>
     </header>
@@ -414,15 +534,6 @@ function Demo() {
   const [done, setDone] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  // Live call state
-  const [liveMode, setLiveMode] = useState(false);
-  const [liveStatus, setLiveStatus] = useState<"idle" | "connecting" | "active" | "ended">("idle");
-  const [liveTranscript, setLiveTranscript] = useState<{ role: string; text: string }[]>([]);
-  const [liveTimer, setLiveTimer] = useState(0);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const vapiRef = useRef<any>(null);
-  const liveTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const runId = useRef(0);
@@ -443,8 +554,6 @@ function Demo() {
 
   // Simulated demo playback
   useEffect(() => {
-    if (liveMode) return;
-
     const myRun = ++runId.current;
     const lines = scenario.lines;
 
@@ -525,89 +634,13 @@ function Demo() {
       if (tickRef.current) clearInterval(tickRef.current);
       if (speechSupported) window.speechSynthesis.cancel();
     };
-  }, [active, soundOn, liveMode]);
-
-  // Live call timer
-  useEffect(() => {
-    if (liveStatus === "active") {
-      liveTickRef.current = setInterval(() => setLiveTimer((t) => t + 1), 1000);
-    }
-    return () => { if (liveTickRef.current) clearInterval(liveTickRef.current); };
-  }, [liveStatus]);
-
-  const startLiveCall = useCallback(async () => {
-    const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
-    if (!publicKey) {
-      alert("Vapi public key not configured. Add NEXT_PUBLIC_VAPI_PUBLIC_KEY to your .env file.");
-      return;
-    }
-
-    try {
-      const VapiModule = await import("@vapi-ai/web");
-      const Vapi = VapiModule.default;
-      const vapi = new Vapi(publicKey);
-      vapiRef.current = vapi;
-
-      setLiveMode(true);
-      setLiveStatus("connecting");
-      setLiveTranscript([]);
-      setLiveTimer(0);
-
-      // Stop simulated demo
-      runId.current++;
-      timers.current.forEach(clearTimeout);
-      if (tickRef.current) clearInterval(tickRef.current);
-      if (speechSupported) window.speechSynthesis.cancel();
-
-      vapi.on("call-start", () => setLiveStatus("active"));
-      vapi.on("call-end", () => {
-        setLiveStatus("ended");
-        if (liveTickRef.current) clearInterval(liveTickRef.current);
-      });
-      vapi.on("error", () => {
-        setLiveStatus("ended");
-        if (liveTickRef.current) clearInterval(liveTickRef.current);
-      });
-      vapi.on("message", (msg: { type: string; role?: string; transcript?: string; transcriptType?: string }) => {
-        if (msg.type === "transcript" && msg.transcriptType === "final" && msg.transcript) {
-          setLiveTranscript((prev) => [...prev, {
-            role: msg.role === "assistant" ? "agent" : "caller",
-            text: msg.transcript!,
-          }]);
-        }
-      });
-
-      await vapi.start("453df4ad-5987-42de-a879-6f5fd10c5796");
-    } catch {
-      setLiveStatus("ended");
-      setLiveMode(false);
-    }
-  }, []);
-
-  const endLiveCall = useCallback(() => {
-    if (vapiRef.current) {
-      vapiRef.current.stop();
-    }
-    setLiveStatus("ended");
-    if (liveTickRef.current) clearInterval(liveTickRef.current);
-  }, []);
-
-  const resetToSimulated = useCallback(() => {
-    setLiveMode(false);
-    setLiveStatus("idle");
-    setLiveTranscript([]);
-    setLiveTimer(0);
-    vapiRef.current = null;
-  }, []);
+  }, [active, soundOn]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [visible, typing, done, liveTranscript]);
-
-  const showLive = liveMode;
-  const currentTimer = showLive ? liveTimer : timer;
+  }, [visible, typing, done]);
 
   return (
     <section className="l-section" id="demo">
@@ -617,37 +650,26 @@ function Demo() {
           <h2>Listen to Golden Robin handle a real call.</h2>
           <p>
             This is the actual flow — your agent answers instantly, understands intent,
-            taps your live systems, and gets the job done. Pick a scenario, or try it live.
+            taps your live systems, and gets the job done. Pick a scenario to listen.
           </p>
-          {!showLive && (
-            <div className="demo-scenarios">
-              {scenarios.map((sc, i) => {
-                const Ico = sc.icon;
-                return (
-                  <button
-                    key={sc.id}
-                    className={`scenario-btn ${i === active ? "active" : ""}`}
-                    onClick={() => setActive(i)}
-                  >
-                    <span className="s-ico"><Ico width={18} height={18} /></span>
-                    <span className="s-meta">
-                      <span className="s-title">{sc.title}</span>
-                      <span className="s-desc">{sc.desc}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          {showLive && liveStatus === "ended" && (
-            <button className="scenario-btn active" onClick={resetToSimulated} style={{ marginTop: 30 }}>
-              <span className="s-ico"><Arrow width={18} height={18} /></span>
-              <span className="s-meta">
-                <span className="s-title">Back to demo scenarios</span>
-                <span className="s-desc">Watch the simulated conversations</span>
-              </span>
-            </button>
-          )}
+          <div className="demo-scenarios">
+            {scenarios.map((sc, i) => {
+              const Ico = sc.icon;
+              return (
+                <button
+                  key={sc.id}
+                  className={`scenario-btn ${i === active ? "active" : ""}`}
+                  onClick={() => setActive(i)}
+                >
+                  <span className="s-ico"><Ico width={18} height={18} /></span>
+                  <span className="s-meta">
+                    <span className="s-title">{sc.title}</span>
+                    <span className="s-desc">{sc.desc}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="reveal">
@@ -658,14 +680,11 @@ function Demo() {
                 <b>Golden Robin &middot; Canadian Tire</b>
                 <span>
                   <span className="live-dot" />
-                  {showLive
-                    ? liveStatus === "connecting" ? "Connecting..." : liveStatus === "active" ? "Live call" : "Call ended"
-                    : "Live call"
-                  }
+                  Live call
                 </span>
               </div>
-              <div className="phone-timer">{fmt(currentTimer)}</div>
-              {!showLive && speechSupported && (
+              <div className="phone-timer">{fmt(timer)}</div>
+              {speechSupported && (
                 <button
                   className={`sound-toggle ${soundOn ? "on" : "off"}`}
                   onClick={() => setSoundOn((s) => !s)}
@@ -678,101 +697,35 @@ function Demo() {
             </div>
 
             <div className="transcript" ref={scrollRef}>
-              {showLive ? (
-                <>
-                  {liveStatus === "connecting" && (
-                    <div className="bubble agent">
-                      <div className="typing"><span /><span /><span /></div>
-                    </div>
-                  )}
-                  {liveTranscript.map((line, i) => (
-                    <div key={i} className={`bubble ${line.role}`}>
-                      <div className="speaker">{line.role === "agent" ? "Golden Robin" : "You"}</div>
-                      {line.text}
-                    </div>
-                  ))}
-                  {liveStatus === "active" && liveTranscript.length === 0 && (
-                    <div style={{ textAlign: "center", color: "var(--text-faint)", fontSize: 14, padding: "40px 20px" }}>
-                      Speak into your microphone — the AI is listening...
-                    </div>
-                  )}
-                  {liveStatus === "ended" && (
-                    <div className="outcome">
-                      <CheckIcon width={16} height={16} /> Call ended
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {visible.map((line, i) => (
-                    <div key={i} className={`bubble ${line.s} ${speaking === i ? "speaking" : ""}`}>
-                      <div className="speaker">{line.s === "agent" ? "Golden Robin" : "Caller"}</div>
-                      {line.t}
-                    </div>
-                  ))}
-                  {typing && (
-                    <div className="bubble agent">
-                      <div className="typing"><span /><span /><span /></div>
-                    </div>
-                  )}
-                  {done && (
-                    <div className="outcome">
-                      <CheckIcon width={16} height={16} /> {scenario.outcome}
-                    </div>
-                  )}
-                </>
+              {visible.map((line, i) => (
+                <div key={i} className={`bubble ${line.s} ${speaking === i ? "speaking" : ""}`}>
+                  <div className="speaker">{line.s === "agent" ? "Golden Robin" : "Caller"}</div>
+                  {line.t}
+                </div>
+              ))}
+              {typing && (
+                <div className="bubble agent">
+                  <div className="typing"><span /><span /><span /></div>
+                </div>
+              )}
+              {done && (
+                <div className="outcome">
+                  <CheckIcon width={16} height={16} /> {scenario.outcome}
+                </div>
               )}
             </div>
 
             <div className="phone-foot">
-              {showLive && liveStatus === "active" ? (
-                <>
-                  <div className="mini-wave" aria-hidden="true">
-                    {[12, 18, 9, 20, 14, 8, 16].map((h, i) => (
-                      <span key={i} style={{ height: h, animationDelay: `${i * 0.08}s` }} />
-                    ))}
-                  </div>
-                  <button className="call-btn" onClick={endLiveCall} aria-label="End call">
-                    <PhoneOff width={20} height={20} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="mini-wave" aria-hidden="true">
-                    {[12, 18, 9, 20, 14, 8, 16].map((h, i) => (
-                      <span key={i} style={{ height: h, animationDelay: `${i * 0.08}s` }} />
-                    ))}
-                  </div>
-                  <button className="call-btn" aria-label="End call">
-                    <PhoneOff width={20} height={20} />
-                  </button>
-                </>
-              )}
+              <div className="mini-wave" aria-hidden="true">
+                {[12, 18, 9, 20, 14, 8, 16].map((h, i) => (
+                  <span key={i} style={{ height: h, animationDelay: `${i * 0.08}s` }} />
+                ))}
+              </div>
+              <button className="call-btn" aria-label="End call">
+                <PhoneOff width={20} height={20} />
+              </button>
             </div>
           </div>
-
-          {!showLive && (
-            <div style={{ textAlign: "center", marginTop: 14 }}>
-              <button
-                className="try-live-btn"
-                onClick={startLiveCall}
-                disabled={liveStatus === "connecting"}
-              >
-                <Mic width={18} height={18} />
-                <span className="pulse-dot" />
-                Talk to our AI live — try it yourself
-              </button>
-              <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 8 }}>
-                Uses your microphone. Real conversation with our Canadian Tire demo agent.
-              </div>
-            </div>
-          )}
-
-          {showLive && liveStatus !== "active" && liveStatus !== "connecting" && (
-            <div style={{ textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--text-faint)" }}>
-              Call ended. <button onClick={resetToSimulated} style={{ color: "var(--teal)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Back to demo</button>
-            </div>
-          )}
         </div>
       </div>
     </section>
