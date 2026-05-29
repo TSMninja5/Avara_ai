@@ -472,8 +472,6 @@ const scenarios = [
   },
 ];
 
-const speechSupported = typeof window !== "undefined" && "speechSynthesis" in window;
-
 function fmt(sec: number) {
   const m = String(Math.floor(sec / 60)).padStart(2, "0");
   const s = String(sec % 60).padStart(2, "0");
@@ -533,6 +531,7 @@ function Demo() {
   const [speaking, setSpeaking] = useState<number | null>(null);
   const [done, setDone] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [speechSupported, setSpeechSupported] = useState(false);
 
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -540,6 +539,13 @@ function Demo() {
   const voicePlan = useRef<VoicePlan | null>(null);
 
   const scenario = scenarios[active];
+
+  // Detect speech synthesis support after mount (avoids hydration mismatch)
+  useEffect(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      setSpeechSupported(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!speechSupported) return;
