@@ -719,47 +719,22 @@ function CTA() {
 /* ────────────────────────────────────────────────────
    FOOTER
    ──────────────────────────────────────────────────── */
-const Social = ({ d }: { d: string }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d={d} /></svg>
-);
-
-const footerCols = [
-  { h: "Product", links: ["Features", "How it works", "Use cases", "Pricing", "Integrations"] },
-  { h: "Company", links: ["About", "Careers", "Blog", "Contact"] },
-  { h: "Resources", links: ["Docs", "API", "Security", "Status"] },
-];
-
 function Footer() {
   return (
     <footer className="l-footer">
       <div className="l-container">
-        <div className="footer-grid">
-          <div>
-            <a href="#top" className="l-brand">
-              <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
-              Aria
-            </a>
-            <p className="footer-blurb">
-              Tailor-fit AI voice agents that answer every call for your business — so no
-              customer is ever left on hold again.
-            </p>
-          </div>
-          {footerCols.map((c) => (
-            <div className="footer-col" key={c.h}>
-              <h5>{c.h}</h5>
-              {c.links.map((l) => (
-                <a href="#" key={l}>{l}</a>
-              ))}
-            </div>
-          ))}
+        <div className="footer-simple">
+          <a href="#top" className="l-brand">
+            <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
+            Aria
+          </a>
+          <p className="footer-blurb">
+            Tailor-fit AI voice agents that answer every call for your business — so no
+            customer is ever left on hold again.
+          </p>
         </div>
         <div className="footer-bottom">
           <span>&copy; {new Date().getFullYear()} Aria Technologies Inc. All rights reserved.</span>
-          <div className="footer-social">
-            <a href="#" aria-label="X"><Social d="M18.9 2H22l-7.3 8.3L23 22h-6.5l-5-6.6L5.6 22H2.5l7.8-8.9L1.7 2h6.6l4.6 6 5-6zm-2.3 18h1.8L7.5 3.8H5.6L16.6 20z" /></a>
-            <a href="#" aria-label="LinkedIn"><Social d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21H9z" /></a>
-            <a href="#" aria-label="GitHub"><Social d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.300-4.6-1.1-4.6-5a4 4 0 0 1 1-2.7c-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7a4 4 0 0 1 1 2.7c0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.8v2.6c0 .3.2.6.7.5A10 10 0 0 0 12 2z" /></a>
-          </div>
         </div>
       </div>
     </footer>
