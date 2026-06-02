@@ -591,21 +591,21 @@ function Stats() {
    ──────────────────────────────────────────────────── */
 const plans = [
   {
-    plan: "Starter", price: "$199", unit: "/mo",
-    note: "For a single location finding its feet.",
-    features: ["Up to 500 calls / month", "1 tailor-fit voice agent", "Appointment booking", "Call transcripts & dashboard", "Email support"],
+    plan: "Starter", price: "$229", unit: "/mo",
+    note: "After-hours & overflow for one location.",
+    features: ["1,000 minutes / month (~400 calls)", "Then $0.25 / minute", "1 tailor-fit voice agent", "Appointment booking", "Call transcripts & dashboard", "Email support"],
     cta: "Start free trial", featured: false,
   },
   {
     plan: "Growth", price: "$549", unit: "/mo",
-    note: "For busy shops that live on the phone.",
-    features: ["Up to 2,500 calls / month", "Up to 3 agents & locations", "Live inventory & pricing lookups", "CRM, POS & calendar integrations", "Multilingual support (30+ languages)", "Priority support"],
+    note: "Every call, all day, for a busy shop.",
+    features: ["2,500 minutes / month (~1,000 calls)", "Then $0.25 / minute", "Up to 3 agents & locations", "Live inventory & pricing lookups", "CRM, POS & calendar integrations", "Multilingual support (30+ languages)", "Priority support"],
     cta: "Book a demo", featured: true,
   },
   {
     plan: "Enterprise", price: "Custom", unit: "",
     note: "For chains and multi-location brands.",
-    features: ["Unlimited calls & locations", "Dedicated solutions engineer", "Custom integrations & SSO", "SOC 2 report & DPA", "SLA & 99.99% uptime"],
+    features: ["Unlimited minutes & locations", "Volume per-minute rates", "Dedicated solutions engineer", "Custom integrations & SSO", "SOC 2 report & DPA", "SLA & 99.99% uptime"],
     cta: "Talk to sales", featured: false,
   },
 ];
