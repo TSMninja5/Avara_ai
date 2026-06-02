@@ -144,9 +144,9 @@ const BrandMark = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#ng)" strokeWidth="2.4" strokeLinecap="round">
       <defs>
         <linearGradient id="ng" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#2dd4bf" />
-          <stop offset="0.5" stopColor="#38bdf8" />
-          <stop offset="1" stopColor="#a78bfa" />
+          <stop offset="0" stopColor="#F0DFC0" />
+          <stop offset="0.5" stopColor="#D4B87A" />
+          <stop offset="1" stopColor="#C8A96E" />
         </linearGradient>
       </defs>
       <line x1="4" y1="10" x2="4" y2="14" />
