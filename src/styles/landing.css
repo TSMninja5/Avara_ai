@@ -734,7 +734,7 @@ html { scroll-behavior: smooth; }
 }
 .tcard .quote { font-size: 16px; color: var(--text); line-height: 1.6; }
 .tcard .who { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
-.tcard .ava { width: 42px; height: 42px; border-radius: 50%; background: var(--grad); flex-shrink: 0; }
+.tcard .ava { width: 42px; height: 42px; border-radius: 50%; background: var(--grad); flex-shrink: 0; object-fit: cover; }
 .tcard .who b { display: block; font-size: 14px; font-weight: 600; }
 .tcard .who span { font-size: 13px; color: var(--text-faint); }
 .stars { display: flex; gap: 2px; color: #f59e0b; margin-bottom: 16px; }

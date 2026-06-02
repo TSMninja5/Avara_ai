@@ -655,9 +655,9 @@ function Pricing() {
    TESTIMONIALS
    ──────────────────────────────────────────────────── */
 const quotes = [
-  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. Aria picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Service Manager, Auto Centre" },
-  { quote: "Customers honestly can't tell it's AI. It knows our pricing, checks stock, and reserves parts before they even hang up. Our advisors finally have time to sell.", name: "Priya Raman", role: "Operations Lead, Retail Group" },
-  { quote: "After-hours used to be dead air. Now we wake up to a list of booked appointments and captured leads. It's like hiring a night shift that never sleeps.", name: "Marc Tremblay", role: "Owner, Northgate Tire & Auto" },
+  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. Aria picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Owner, Northgate Tire & Auto — Hamilton, ON", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { quote: "Customers honestly can't tell it's AI. It knows our pricing, checks stock, and reserves parts before they even hang up. Our advisors finally have time to sell.", name: "Priya Raman", role: "Operations Manager, Maple Ridge Automotive — Surrey, BC", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { quote: "After-hours used to be dead air. Now we wake up to a list of booked appointments and captured leads. It's like hiring a night shift that never sleeps.", name: "Marc Tremblay", role: "Owner, Summit Auto Centre — Laval, QC", img: "https://randomuser.me/api/portraits/men/52.jpg" },
 ];
 
 function Testimonials() {
@@ -674,7 +674,7 @@ function Testimonials() {
               <div className="stars">{[...Array(5)].map((_, j) => <Star key={j} />)}</div>
               <p className="quote">&ldquo;{q.quote}&rdquo;</p>
               <div className="who">
-                <span className="ava" />
+                <Image className="ava" src={q.img} alt={q.name} width={42} height={42} />
                 <div>
                   <b>{q.name}</b>
                   <span>{q.role}</span>
