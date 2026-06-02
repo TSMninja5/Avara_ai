@@ -736,6 +736,10 @@ function Footer() {
         <div className="footer-bottom">
           <span>&copy; {new Date().getFullYear()} Aria Technologies Inc. All rights reserved.</span>
         </div>
+        <p className="footer-disclaimer">
+          Testimonials, names, and photos shown are illustrative examples for demonstration
+          purposes only and do not represent actual customers.
+        </p>
       </div>
     </footer>
   );
