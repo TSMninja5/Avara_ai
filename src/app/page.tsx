@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState, useCallback, createContext, useContext } from "react";
 import Image from "next/image";
 
 /* Base path for GitHub Pages — must match next.config.ts basePath */
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+/* Where lead submissions are emailed (FormSubmit.co — no backend needed). */
+const LEAD_ENDPOINT = "https://formsubmit.co/ajax/tejbeermanchanda@gmail.com";
+
+/* Lead modal context — any CTA can open the popup with a topic for the prefilled message. */
+const LeadModalContext = createContext<(topic: string) => void>(() => {});
+const useLeadModal = () => useContext(LeadModalContext);
 
 /* ────────────────────────────────────────────────────
    HOOKS
@@ -162,6 +168,7 @@ const BrandMark = () => (
    ──────────────────────────────────────────────────── */
 function Navbar() {
   const scrolled = useScrolled();
+  const openLead = useLeadModal();
   return (
     <nav className={`l-nav ${scrolled ? "scrolled" : ""}`}>
       <div className="l-container l-nav-inner">
@@ -176,10 +183,10 @@ function Navbar() {
           <a href="#pricing">Pricing</a>
         </div>
         <div className="l-nav-cta">
-          <Link className="login" href="/sign-in">Sign in</Link>
-          <Link className="l-btn l-btn-primary" href="/sign-up">
+          <button className="login" onClick={() => openLead("Aria")}>Sign in</button>
+          <button className="l-btn l-btn-primary" onClick={() => openLead("getting started with Aria")}>
             Get started <Arrow className="arrow" width={16} height={16} />
-          </Link>
+          </button>
           <button className="l-nav-toggle" aria-label="Menu"><MenuIcon /></button>
         </div>
       </div>
@@ -199,6 +206,7 @@ function fmt(sec: number) {
 }
 
 function Hero() {
+  const openLead = useLeadModal();
   // Vapi call state
   const [callStatus, setCallStatus] = useState<"idle" | "connecting" | "active" | "ended">("idle");
   const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
@@ -305,9 +313,9 @@ function Hero() {
             real time. No hold music. No voicemail. No lost revenue.
           </p>
           <div className="hero-actions">
-            <Link className="l-btn l-btn-primary l-btn-lg" href="/sign-up">
+            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with Aria")}>
               Get started free <Arrow className="arrow" width={18} height={18} />
-            </Link>
+            </button>
             <a className="l-btn l-btn-ghost l-btn-lg" href="#how">
               See how it works
             </a>
@@ -611,6 +619,7 @@ const plans = [
 ];
 
 function Pricing() {
+  const openLead = useLeadModal();
   return (
     <section className="l-section" id="pricing">
       <div className="l-container">
@@ -631,9 +640,9 @@ function Pricing() {
                   <li key={f}><CheckIcon /> {f}</li>
                 ))}
               </ul>
-              <Link className={`l-btn ${p.featured ? "l-btn-primary" : "l-btn-ghost"}`} href="/sign-up">
+              <button className={`l-btn ${p.featured ? "l-btn-primary" : "l-btn-ghost"}`} onClick={() => openLead(`the ${p.plan} plan`)}>
                 {p.cta} <Arrow className="arrow" width={16} height={16} />
-              </Link>
+              </button>
             </div>
           ))}
         </div>
@@ -683,6 +692,7 @@ function Testimonials() {
    CTA
    ──────────────────────────────────────────────────── */
 function CTA() {
+  const openLead = useLeadModal();
   return (
     <section className="l-section" id="cta">
       <div className="l-container">
@@ -693,9 +703,9 @@ function CTA() {
             spin up an agent trained on your shop — on the call.
           </p>
           <div className="cta-actions">
-            <Link className="l-btn l-btn-primary l-btn-lg" href="/sign-up">
+            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with Aria")}>
               Get started free <Arrow className="arrow" width={18} height={18} />
-            </Link>
+            </button>
             <a className="l-btn l-btn-ghost l-btn-lg" href="tel:+17624262064">
               <Phone width={17} height={17} /> Call our AI: (762) 426-2064
             </a>
@@ -757,26 +767,133 @@ function Footer() {
 }
 
 /* ────────────────────────────────────────────────────
+   LEAD MODAL — popup contact form (emailed via FormSubmit.co)
+   ──────────────────────────────────────────────────── */
+function LeadModal({ topic, onClose }: { topic: string | null; onClose: () => void }) {
+  const open = topic !== null;
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+
+  // Prefill the message based on which button opened the modal
+  useEffect(() => {
+    if (topic) {
+      setForm((f) => ({ ...f, message: `Hi, I'm reaching out about ${topic}.` }));
+      setStatus("idle");
+    }
+  }, [topic]);
+
+  // Esc to close + lock background scroll while open
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    try {
+      const res = await fetch(LEAD_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          company: form.company,
+          message: form.message,
+          _subject: `New Aria lead — ${topic}`,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+      setStatus(res.ok ? "done" : "error");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="lead-overlay" onClick={onClose}>
+      <div className="lead-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+        <button className="lead-close" onClick={onClose} aria-label="Close">&times;</button>
+        {status === "done" ? (
+          <div className="lead-success">
+            <div className="lead-check"><CheckIcon width={28} height={28} /></div>
+            <h3>Thanks &mdash; we&apos;ll be in touch!</h3>
+            <p>We&apos;ve received your details and someone from Aria will reach out shortly.</p>
+            <button className="l-btn l-btn-primary l-btn-lg" onClick={onClose}>Done</button>
+          </div>
+        ) : (
+          <>
+            <h3>Get started with Aria</h3>
+            <p className="lead-sub">Tell us a bit about your business and we&apos;ll set you up.</p>
+            <form className="lead-form" onSubmit={submit}>
+              <label className="lead-field">
+                <span>Name</span>
+                <input type="text" required value={form.name} onChange={set("name")} placeholder="Jane Smith" />
+              </label>
+              <label className="lead-field">
+                <span>Email</span>
+                <input type="email" required value={form.email} onChange={set("email")} placeholder="jane@yourshop.com" />
+              </label>
+              <label className="lead-field">
+                <span>Company</span>
+                <input type="text" value={form.company} onChange={set("company")} placeholder="Yourshop Auto & Tire" />
+              </label>
+              <label className="lead-field">
+                <span>Message</span>
+                <textarea rows={3} value={form.message} onChange={set("message")} />
+              </label>
+              {status === "error" && (
+                <p className="lead-err">Something went wrong. Please try again, or email us directly.</p>
+              )}
+              <button className="l-btn l-btn-primary l-btn-lg" type="submit" disabled={status === "sending"}>
+                {status === "sending" ? "Sending…" : "Send"} <Arrow className="arrow" width={18} height={18} />
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────
    PAGE
    ──────────────────────────────────────────────────── */
 export default function HomePage() {
   useReveal();
+  const [leadTopic, setLeadTopic] = useState<string | null>(null);
+  const openLead = useCallback((topic: string) => setLeadTopic(topic), []);
 
   return (
-    <div className="landing-page">
-      <Navbar />
-      <main>
-        <Hero />
-        <LogoBar />
-        <Features />
-        <HowItWorks />
-        <UseCases />
-        <Stats />
-        <Pricing />
-        <Testimonials />
-        <CTA />
-      </main>
-      <Footer />
-    </div>
+    <LeadModalContext.Provider value={openLead}>
+      <div className="landing-page">
+        <Navbar />
+        <main>
+          <Hero />
+          <LogoBar />
+          <Features />
+          <HowItWorks />
+          <UseCases />
+          <Stats />
+          <Pricing />
+          <Testimonials />
+          <CTA />
+        </main>
+        <Footer />
+      </div>
+      <LeadModal topic={leadTopic} onClose={() => setLeadTopic(null)} />
+    </LeadModalContext.Provider>
   );
 }

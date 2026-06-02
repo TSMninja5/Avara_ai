@@ -243,16 +243,16 @@ html { scroll-behavior: smooth; }
 .l-nav-links a { color: var(--text-muted); font-size: 15px; font-weight: 500; transition: color 0.2s ease; }
 .l-nav-links a:hover { color: var(--text); }
 .l-nav-cta { display: flex; align-items: center; gap: 14px; }
-.l-nav-cta a.login { color: var(--text-muted); font-size: 15px; font-weight: 500; }
-.l-nav-cta a.login:hover { color: var(--text); }
+.l-nav-cta .login { color: var(--text-muted); font-size: 15px; font-weight: 500; background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit; }
+.l-nav-cta .login:hover { color: var(--text); }
 .l-nav-toggle { display: none; background: none; border: 0; color: var(--text); padding: 8px; }
 
 /* nav dark mode for dark hero */
 .l-nav:not(.scrolled) .l-nav-links a { color: rgba(255,255,255,0.7); }
 .l-nav:not(.scrolled) .l-nav-links a:hover { color: #fff; }
 .l-nav:not(.scrolled) .l-brand { color: #fff; }
-.l-nav:not(.scrolled) .l-nav-cta a.login { color: rgba(255,255,255,0.7); }
-.l-nav:not(.scrolled) .l-nav-cta a.login:hover { color: #fff; }
+.l-nav:not(.scrolled) .l-nav-cta .login { color: rgba(255,255,255,0.7); }
+.l-nav:not(.scrolled) .l-nav-cta .login:hover { color: #fff; }
 .l-nav:not(.scrolled) .l-nav-toggle { color: #fff; }
 .l-nav:not(.scrolled) .brand-mark { border-color: rgba(255,255,255,0.2); }
 
@@ -812,3 +812,74 @@ html { scroll-behavior: smooth; }
   .landing-page *, .landing-page *::before, .landing-page *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ============================================================
+   LEAD MODAL
+   ============================================================ */
+.lead-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: rgba(8, 8, 16, 0.6);
+  backdrop-filter: blur(6px);
+  animation: lead-fade 0.25s ease;
+}
+@keyframes lead-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.lead-modal {
+  position: relative;
+  width: 100%; max-width: 460px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 40px 90px -30px rgba(15, 23, 42, 0.55);
+  padding: 34px 32px;
+  animation: pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  color: var(--text);
+}
+.lead-modal h3 { font-size: 25px; font-family: var(--font-display); letter-spacing: -0.02em; }
+.lead-sub { color: var(--text-muted); font-size: 15px; margin: 8px 0 22px; }
+
+.lead-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 22px; line-height: 1;
+  cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease;
+}
+.lead-close:hover { color: var(--text); border-color: var(--border-strong); }
+
+.lead-form { display: flex; flex-direction: column; gap: 14px; }
+.lead-field { display: flex; flex-direction: column; gap: 6px; }
+.lead-field span { font-size: 13px; font-weight: 600; color: var(--text); }
+.lead-field input, .lead-field textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  font-family: inherit; font-size: 15px; color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
+}
+.lead-field input::placeholder, .lead-field textarea::placeholder { color: var(--text-faint); }
+.lead-field input:focus, .lead-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.18);
+}
+.lead-form .l-btn { width: 100%; margin-top: 4px; }
+.lead-err { color: #ef4444; font-size: 13px; margin: 0; }
+
+.lead-success { text-align: center; padding: 12px 0; }
+.lead-check {
+  width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 18px;
+  display: grid; place-items: center;
+  background: var(--grad-soft); border: 1px solid rgba(200, 169, 110, 0.35);
+  color: var(--accent);
+}
+.lead-success h3 { font-size: 23px; }
+.lead-success p { color: var(--text-muted); font-size: 15px; margin: 10px 0 22px; }
