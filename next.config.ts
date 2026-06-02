@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     remotePatterns: [{ protocol: "https", hostname: "randomuser.me" }],
   },
-  basePath: "/Avara_ai",
-  assetPrefix: "/Avara_ai/",
 };
 
 export default nextConfig;
