@@ -30,9 +30,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Aria — AI Phone Answering for Business",
+  title: "FrontDesk AI — AI Phone Answering for Business",
   description:
-    "Never miss a customer call. Aria answers your phone with AI that sounds human, books appointments, and sends you instant summaries.",
+    "Never miss a customer call. FrontDesk answers your phone with AI that sounds human, books appointments, and sends you instant summaries.",
 };
 
 export default function RootLayout({

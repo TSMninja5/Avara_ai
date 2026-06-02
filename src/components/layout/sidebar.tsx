@@ -26,9 +26,9 @@ export function Sidebar() {
     <div className="flex h-full w-64 flex-col border-r bg-white">
       <div className="flex h-16 items-center gap-2 border-b px-6">
         <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center">
-          <span className="text-white font-bold text-sm">A</span>
+          <span className="text-white font-bold text-sm">F</span>
         </div>
-        <span className="text-lg font-bold text-gray-900">Aria</span>
+        <span className="text-lg font-bold text-gray-900">FrontDesk AI</span>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">

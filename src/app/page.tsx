@@ -147,7 +147,7 @@ const Mic = (p: IconProps) => (
    ──────────────────────────────────────────────────── */
 const BrandMark = () => (
   <span className="brand-mark" aria-hidden>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#ng)" strokeWidth="2.4" strokeLinecap="round">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="url(#ng)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <defs>
         <linearGradient id="ng" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#F0DFC0" />
@@ -155,10 +155,10 @@ const BrandMark = () => (
           <stop offset="1" stopColor="#C8A96E" />
         </linearGradient>
       </defs>
-      <line x1="4" y1="10" x2="4" y2="14" />
-      <line x1="9" y1="6" x2="9" y2="18" />
-      <line x1="14" y1="3" x2="14" y2="21" />
-      <line x1="19" y1="8" x2="19" y2="16" />
+      <path d="M4 18h16" />
+      <path d="M6 18a6 6 0 0 1 12 0" />
+      <path d="M12 12V8" />
+      <circle cx="12" cy="6.4" r="1.4" fill="url(#ng)" stroke="none" />
     </svg>
   </span>
 );
@@ -173,8 +173,8 @@ function Navbar() {
     <nav className={`l-nav ${scrolled ? "scrolled" : ""}`}>
       <div className="l-container l-nav-inner">
         <a href="#top" className="l-brand">
-          <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
-          Aria
+          <BrandMark />
+          FrontDesk AI
         </a>
         <div className="l-nav-links">
           <a href="#features">Capabilities</a>
@@ -183,8 +183,8 @@ function Navbar() {
           <a href="#pricing">Pricing</a>
         </div>
         <div className="l-nav-cta">
-          <button className="login" onClick={() => openLead("Aria")}>Sign in</button>
-          <button className="l-btn l-btn-primary" onClick={() => openLead("getting started with Aria")}>
+          <button className="login" onClick={() => openLead("FrontDesk AI")}>Sign in</button>
+          <button className="l-btn l-btn-primary" onClick={() => openLead("getting started with FrontDesk AI")}>
             Get started <Arrow className="arrow" width={16} height={16} />
           </button>
           <button className="l-nav-toggle" aria-label="Menu"><MenuIcon /></button>
@@ -308,12 +308,12 @@ function Hero() {
             customer call <span className="grad-text">again.</span>
           </h1>
           <p className="hero-sub">
-            Aria builds tailor-fit AI voice agents that pick up every call for your
+            FrontDesk builds tailor-fit AI voice agents that pick up every call for your
             business — booking appointments, quoting prices, and checking inventory in
             real time. No hold music. No voicemail. No lost revenue.
           </p>
           <div className="hero-actions">
-            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with Aria")}>
+            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with FrontDesk AI")}>
               Get started free <Arrow className="arrow" width={18} height={18} />
             </button>
             <a className="l-btn l-btn-ghost l-btn-lg" href="#how">
@@ -434,7 +434,7 @@ function LogoBar() {
         <div className="section-head reveal">
           <span className="eyebrow">Built for</span>
           <h2>Service businesses like</h2>
-          <p>We&apos;re building Aria for the brands that run on phone calls.</p>
+          <p>We&apos;re building FrontDesk for the brands that run on phone calls.</p>
         </div>
         <div className="logobar-row reveal">
           {logos.map((l) => (
@@ -457,12 +457,12 @@ function LogoBar() {
    FEATURES
    ──────────────────────────────────────────────────── */
 const features = [
-  { icon: Brain, title: "Trained on your business", desc: "Aria learns your services, hours, pricing, policies and tone — so it answers like your best employee, not a generic bot.", wide: true },
+  { icon: Brain, title: "Trained on your business", desc: "FrontDesk learns your services, hours, pricing, policies and tone — so it answers like your best employee, not a generic bot.", wide: true },
   { icon: Bolt, title: "Sub-second response", desc: "Natural, uninterrupted conversation with no awkward lag. Callers feel heard, not handled." },
   { icon: Calendar, title: "Books appointments", desc: "Reads your live calendar, offers real openings, and writes the booking back automatically." },
   { icon: BoxIcon, title: "Checks live inventory", desc: "Looks up stock and pricing in real time and can reserve items for pickup on the spot." },
   { icon: Plug, title: "Connects to your stack", desc: "Plugs into your POS, CRM, scheduling and phone system. Works with the tools you already run." },
-  { icon: Handoff, title: "Knows when to hand off", desc: "For anything sensitive or out of scope, Aria transfers to the right person — with full call context, so customers never repeat themselves." },
+  { icon: Handoff, title: "Knows when to hand off", desc: "For anything sensitive or out of scope, FrontDesk transfers to the right person — with full call context, so customers never repeat themselves." },
   { icon: Chart, title: "Every call, captured", desc: "Full transcripts, intent tags, sentiment and outcomes — searchable in one dashboard." },
   { icon: Shield, title: "Secure & compliant", desc: "SOC 2 Type II, PCI-aware call handling, and PIPEDA/GDPR-ready data controls by default." },
 ];
@@ -497,8 +497,8 @@ function Features() {
    HOW IT WORKS
    ──────────────────────────────────────────────────── */
 const steps = [
-  { n: "01", title: "Connect your number", desc: "Forward your existing line or get a new one. Aria starts answering overflow, after-hours, or every call — your call." },
-  { n: "02", title: "Train on your business", desc: "Point Aria at your website, price lists, calendar and systems. It builds a tailor-fit agent in minutes, not months." },
+  { n: "01", title: "Connect your number", desc: "Forward your existing line or get a new one. FrontDesk starts answering overflow, after-hours, or every call — your call." },
+  { n: "02", title: "Train on your business", desc: "Point FrontDesk at your website, price lists, calendar and systems. It builds a tailor-fit agent in minutes, not months." },
   { n: "03", title: "Go live & watch it work", desc: "Your agent handles calls 24/7. Review transcripts, outcomes and bookings from one dashboard, and refine anytime." },
 ];
 
@@ -509,7 +509,7 @@ function HowItWorks() {
         <div className="section-head reveal">
           <span className="eyebrow">How it works</span>
           <h2>Live in a day, not a quarter</h2>
-          <p>No integration team required. If you can describe how your front desk works, Aria can run it.</p>
+          <p>No integration team required. If you can describe how your front desk works, FrontDesk can run it.</p>
         </div>
         <div className="steps">
           {steps.map((s, i) => (
@@ -547,7 +547,7 @@ function UseCases() {
         <div className="section-head reveal">
           <span className="eyebrow">Built for</span>
           <h2>Any business that lives on the phone</h2>
-          <p>If customers call you to book, buy or ask — Aria makes sure someone always answers.</p>
+          <p>If customers call you to book, buy or ask — FrontDesk makes sure someone always answers.</p>
         </div>
         <div className="usecases">
           {useCases.map((c, i) => (
@@ -655,7 +655,7 @@ function Pricing() {
    TESTIMONIALS
    ──────────────────────────────────────────────────── */
 const quotes = [
-  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. Aria picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Owner, Northgate Tire & Auto — Hamilton, ON", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { quote: "We were sending 40% of our calls to voicemail during the winter tire rush. FrontDesk picked up every single one and booked them. It paid for itself in a weekend.", name: "Dave Mercier", role: "Owner, Northgate Tire & Auto — Hamilton, ON", img: "https://randomuser.me/api/portraits/men/32.jpg" },
   { quote: "Customers honestly can't tell it's AI. It knows our pricing, checks stock, and reserves parts before they even hang up. Our advisors finally have time to sell.", name: "Priya Raman", role: "Operations Manager, Maple Ridge Automotive — Surrey, BC", img: "https://randomuser.me/api/portraits/women/68.jpg" },
   { quote: "After-hours used to be dead air. Now we wake up to a list of booked appointments and captured leads. It's like hiring a night shift that never sleeps.", name: "Marc Tremblay", role: "Owner, Summit Auto Centre — Laval, QC", img: "https://randomuser.me/api/portraits/men/52.jpg" },
 ];
@@ -699,11 +699,11 @@ function CTA() {
         <div className="cta-band reveal">
           <h2>Stop losing customers<br />to hold music.</h2>
           <p>
-            See Aria answer a live call for your business. Book a 15-minute demo and we&apos;ll
+            See FrontDesk answer a live call for your business. Book a 15-minute demo and we&apos;ll
             spin up an agent trained on your shop — on the call.
           </p>
           <div className="cta-actions">
-            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with Aria")}>
+            <button className="l-btn l-btn-primary l-btn-lg" onClick={() => openLead("getting started with FrontDesk AI")}>
               Get started free <Arrow className="arrow" width={18} height={18} />
             </button>
             <a className="l-btn l-btn-ghost l-btn-lg" href="tel:+17624262064">
@@ -725,8 +725,8 @@ function Footer() {
       <div className="l-container">
         <div className="footer-simple">
           <a href="#top" className="l-brand">
-            <Image src={`${BASE}/logos/aria.png`} alt="Aria" width={32} height={32} className="brand-logo" />
-            Aria
+            <BrandMark />
+            FrontDesk AI
           </a>
           <p className="footer-blurb">
             Tailor-fit AI voice agents that answer every call for your business — so no
@@ -734,7 +734,7 @@ function Footer() {
           </p>
         </div>
         <div className="footer-bottom">
-          <span>&copy; {new Date().getFullYear()} Aria Technologies Inc. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} FrontDesk AI. All rights reserved.</span>
         </div>
         <p className="footer-disclaimer">
           Testimonials, names, and photos shown are illustrative examples for demonstration
@@ -790,7 +790,7 @@ function LeadModal({ topic, onClose }: { topic: string | null; onClose: () => vo
           email: form.email,
           company: form.company,
           message: form.message,
-          _subject: `New Aria lead — ${topic}`,
+          _subject: `New FrontDesk AI lead — ${topic}`,
           _template: "table",
           _captcha: "false",
         }),
@@ -809,12 +809,12 @@ function LeadModal({ topic, onClose }: { topic: string | null; onClose: () => vo
           <div className="lead-success">
             <div className="lead-check"><CheckIcon width={28} height={28} /></div>
             <h3>Thanks &mdash; we&apos;ll be in touch!</h3>
-            <p>We&apos;ve received your details and someone from Aria will reach out shortly.</p>
+            <p>We&apos;ve received your details and someone from FrontDesk AI will reach out shortly.</p>
             <button className="l-btn l-btn-primary l-btn-lg" onClick={onClose}>Done</button>
           </div>
         ) : (
           <>
-            <h3>Get started with Aria</h3>
+            <h3>Get started with FrontDesk AI</h3>
             <p className="lead-sub">Tell us a bit about your business and we&apos;ll set you up.</p>
             <form className="lead-form" onSubmit={submit}>
               <label className="lead-field">
