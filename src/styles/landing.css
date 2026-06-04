@@ -830,8 +830,10 @@ html { scroll-behavior: smooth; }
   .l-mobile-menu .l-btn { width: 100%; margin-top: 14px; }
   .features-grid, .steps, .pricing-grid, .tcards, .usecases { grid-template-columns: 1fr; }
   .feature.wide { grid-column: span 1; }
-  .l-hero .hero-grid { padding-top: 100px; }
-  .hero-sub { font-size: 17px; }
+  .l-hero { min-height: auto; }
+  .l-hero .hero-grid { min-height: auto; padding: 92px 0 44px; gap: 24px; }
+  .l-hero h1 { font-size: 27px; letter-spacing: -0.02em; }
+  .hero-sub { font-size: 14.5px; margin-top: 12px; }
   .cta-band { padding: 50px 26px; }
   .stats-band { grid-template-columns: 1fr 1fr; padding: 40px 24px; }
   .price-card.featured { transform: none; }
