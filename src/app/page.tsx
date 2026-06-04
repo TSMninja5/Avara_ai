@@ -138,6 +138,9 @@ const Star = (p: IconProps) => (
 const MenuIcon = (p: IconProps) => (
   <svg {...svgBase} {...p}><path d="M3 12h18M3 6h18M3 18h18" /></svg>
 );
+const CloseIcon = (p: IconProps) => (
+  <svg {...svgBase} {...p}><path d="M18 6 6 18M6 6l12 12" /></svg>
+);
 const Mic = (p: IconProps) => (
   <svg {...svgBase} {...p}><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v4" /></svg>
 );
@@ -169,10 +172,12 @@ const BrandMark = () => (
 function Navbar() {
   const scrolled = useScrolled();
   const openLead = useLeadModal();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
   return (
-    <nav className={`l-nav ${scrolled ? "scrolled" : ""}`}>
+    <nav className={`l-nav ${scrolled ? "scrolled" : ""} ${menuOpen ? "menu-open" : ""}`}>
       <div className="l-container l-nav-inner">
-        <a href="#top" className="l-brand">
+        <a href="#top" className="l-brand" onClick={closeMenu}>
           <BrandMark />
           FrontDesk AI
         </a>
@@ -187,8 +192,29 @@ function Navbar() {
           <button className="l-btn l-btn-primary" onClick={() => openLead("getting started with FrontDesk AI")}>
             Get started <Arrow className="arrow" width={16} height={16} />
           </button>
-          <button className="l-nav-toggle" aria-label="Menu"><MenuIcon /></button>
+          <button
+            className="l-nav-toggle"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            {menuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
         </div>
+      </div>
+
+      {/* Mobile dropdown menu */}
+      <div className="l-mobile-menu">
+        <a href="#features" onClick={closeMenu}>Capabilities</a>
+        <a href="#how" onClick={closeMenu}>How it works</a>
+        <a href="#usecases" onClick={closeMenu}>Use cases</a>
+        <a href="#pricing" onClick={closeMenu}>Pricing</a>
+        <button
+          className="l-btn l-btn-primary l-btn-lg"
+          onClick={() => { closeMenu(); openLead("getting started with FrontDesk AI"); }}
+        >
+          Get started <Arrow className="arrow" width={16} height={16} />
+        </button>
       </div>
     </nav>
   );
