@@ -36,4 +36,6 @@
 
 html {
   scroll-behavior: smooth;
+  /* Opt out of mobile browser auto-dark (Android Chrome): the site is light by design */
+  color-scheme: only light;
 }
